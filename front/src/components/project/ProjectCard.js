@@ -1,6 +1,21 @@
 import { Card, Button, Row, Col } from "react-bootstrap";
+import * as Api from "../../api";
 
-function ProjectCard({ project, isEditable, setIsEditing }) {
+function ProjectCard({ project, setProjects, isEditable, setIsEditing }) {
+
+  const handleDelete = async (e) => {
+    e.preventDefault();
+    try {
+      await Api.delete("projects", project.id);
+    } catch (err) {
+      console.log("삭제 중 에러가 발생했습니다.", err);
+    }
+    setProjects((e) => {
+      const delProject = e.filter((v) => v.id !== project.id);
+        return delProject;    
+    });
+  };
+
   return (
     <Card.Text>
       <Row className="justify-content-between align-items-center mb-2">
@@ -22,6 +37,14 @@ function ProjectCard({ project, isEditable, setIsEditing }) {
               className="mr-3"
             >
               편집
+            </Button>
+            <Button
+              variant="outline-danger"              
+              size="sm"
+              onClick={handleDelete}
+              className="mr-3"
+            >
+              삭제
             </Button>
           </Col>
         )}
