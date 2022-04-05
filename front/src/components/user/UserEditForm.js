@@ -9,7 +9,7 @@ function UserEditForm({ user, setIsEditing, setUser }) {
   const [email, setEmail] = useState(user.email);
   //useState로 description 상태를 생성함.
   const [description, setDescription] = useState(user.description);
-
+  const [image, setImage] = useState();
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -28,10 +28,35 @@ function UserEditForm({ user, setIsEditing, setUser }) {
     setIsEditing(false);
   };
 
+  const imagePreview = (fileBlob) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(fileBlob);
+    reader.onload = () => {
+      setImage(reader.result);
+    };
+  };
   return (
     <Card className="mb-2">
       <Card.Body>
         <Form onSubmit={handleSubmit}>
+          <Form.Group controlId="useEditImage" className="mb-3">
+            <Form.Control
+              type="file"
+              accept="image/*"
+              onChange={(e) => {
+                imagePreview(e.target.files[0]);
+              }}
+            />
+          </Form.Group>
+          {image && (
+            <div className="text-center mb-3">
+              <img
+                style={{ width: "10rem", height: "8rem" }}
+                src={image}
+                alt="이미지 미리보기"
+              />
+            </div>
+          )}
           <Form.Group controlId="useEditName" className="mb-3">
             <Form.Control
               type="text"
