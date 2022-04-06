@@ -4,3 +4,9 @@ node_modules
 # env
 back/.env
 .env
+
+# uploads images
+back/uploads/*.jpg
+back/uploads/*.png
+back/uploads/*.jpeg
+
