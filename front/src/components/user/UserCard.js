@@ -17,6 +17,13 @@ function UserCard({ user, setIsEditing, isEditable, isNetwork }) {
         <Card.Title>{user?.name}</Card.Title>
         <Card.Subtitle className="mb-2 text-muted">{user?.email}</Card.Subtitle>
         <Card.Text>{user?.description}</Card.Text>
+        {/* 카카오페이 송금 버튼 */}
+        <Card.Img className="justify-content-md-center"
+          style={{ width: "10rem", height: "3rem", cursor:"pointer" }}
+          src={"/assets/btn_request_small.png"}
+          alt="카카오페이 송금 (https://developers.kakaopay.com/ API 사용)"
+          onClick={() => window.open("http://kko.to/QR5m8e-3c","_blank")}
+        />
 
         {isEditable && (
           <Col>
