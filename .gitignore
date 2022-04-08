@@ -5,8 +5,6 @@ node_modules
 back/.env
 .env
 
-# uploads images
-back/uploads/*.jpg
-back/uploads/*.png
-back/uploads/*.jpeg
+# config
+back/src/config/
 
