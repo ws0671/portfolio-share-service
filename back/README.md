@@ -45,7 +45,7 @@ yarn
 yarn start
 ```
 
-## 4. 파일 업로드를 위한 multer 설치 및 스토리지 생성
+## 4. 파일 업로드를 위한 multer 설치 및 AWS S3 스토리지 연결
 
 파일 업로드 기능을 위해 multer 패키지를 설치합니다.
 
@@ -53,11 +53,11 @@ yarn start
 yarn add multer
 ```
 
-파일이 저장될 로컬 스토리지를 생성합니다.
+back/src/config 디렉토리를 생성하고 AWS S3 정보를 추가합니다.
 ```
 back
 ㄴsrc
-ㄴuploads # 디렉토리 추가
+  ㄴconfig
 ```
 
 
@@ -86,5 +86,5 @@ back
   - 학습 편의를 위해 일괄 http 400 코드로 에러를 변환하는 에러핸들러인 errorMiddleware.js
   - 이미지 파일을 서버의 로컬 스토리지에 저장하는 multer 미들웨어인 upload.js
 
-- uploads:
-  - 사진 파일을 저장하는 서버 로컬의 스토리지
+- src/config:
+  - 기타 환경설정과 관련 코드가 있는 폴더
