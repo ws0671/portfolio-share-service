@@ -1,3 +1,4 @@
+import axios from "axios";
 import React, { useState } from "react";
 import { Button, Form, Card, Col, Row } from "react-bootstrap";
 import * as Api from "../../api";
@@ -9,15 +10,27 @@ function UserEditForm({ user, setIsEditing, setUser }) {
   const [email, setEmail] = useState(user.email);
   //useState로 description 상태를 생성함.
   const [description, setDescription] = useState(user.description);
-  const [image, setImage] = useState();
+  const [image, setImage] = useState(user.image);
+  const [blob, setBlob] = useState();
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // 사진을 s3에 저장합니다.
+    const formData = new FormData();
+    formData.append("file", blob);
+    await axios.post(`http://localhost:5000/user/upload/image`, formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+        Authorization: `Bearer ${sessionStorage.getItem("userToken")}`,
+      },
+    });
 
     // "users/유저id" 엔드포인트로 PUT 요청함.
     const res = await Api.put(`users/${user.id}`, {
       name,
       email,
       description,
+      image,
     });
     // 유저 정보는 response의 data임.
     const updatedUser = res.data;
@@ -29,6 +42,7 @@ function UserEditForm({ user, setIsEditing, setUser }) {
   };
 
   const imagePreview = (fileBlob) => {
+    setBlob(fileBlob);
     const reader = new FileReader();
     reader.readAsDataURL(fileBlob);
     reader.onload = () => {
@@ -38,7 +52,7 @@ function UserEditForm({ user, setIsEditing, setUser }) {
   return (
     <Card className="mb-2">
       <Card.Body>
-        <Form onSubmit={handleSubmit}>
+        <Form onSubmit={handleSubmit} encType="multipart/form-data">
           <Form.Group controlId="useEditImage" className="mb-3">
             <Form.Control
               type="file"
@@ -86,7 +100,7 @@ function UserEditForm({ user, setIsEditing, setUser }) {
 
           <Form.Group as={Row} className="mt-3 text-center">
             <Col sm={{ span: 20 }}>
-              <Button variant="primary" type="submit" className="me-3">
+              <Button type="submit" variant="primary" className="me-3">
                 확인
               </Button>
               <Button variant="secondary" onClick={() => setIsEditing(false)}>
