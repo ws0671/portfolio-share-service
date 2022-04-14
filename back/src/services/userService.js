@@ -3,7 +3,9 @@ import bcrypt from "bcrypt";
 import { v4 as uuidv4 } from "uuid";
 import jwt from "jsonwebtoken";
 
+
 class userAuthService {
+
   static async addUser({ name, email, password }) {
     // 이메일 중복 확인
     const user = await User.findByEmail({ email });
@@ -26,6 +28,30 @@ class userAuthService {
 
     return createdNewUser;
   }
+
+  static async addGoogleUser({ profile }) {
+
+    // 비밀번호 해쉬화
+    const hashedPassword = await bcrypt.hash(profile.displayName, 10);
+
+    // id 는 유니크 값 부여
+    const id = uuidv4();
+    const newUser = { 
+      id, 
+      name: profile.displayName, 
+      email: profile.emails[0].value, 
+      password: hashedPassword,
+      provider: 'google'
+    };
+
+    // db에 저장
+    const createdNewUser = await User.create({ newUser });
+    createdNewUser.errorMessage = null; // 문제 없이 db 저장 완료되었으므로 에러가 없음.
+
+    return createdNewUser;
+  }
+
+  
 
   static async getUser({ email, password }) {
     // 이메일 db에 존재 여부 확인
