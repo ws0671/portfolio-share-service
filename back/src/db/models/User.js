@@ -11,6 +11,19 @@ class User {
     return user;
   }
 
+  /**
+   * google 로그인시 가입여부 확인하는 함수
+   */
+  static async findByGoogleEmail({ profile }) {
+    const user = await UserModel.findOne({
+      where:{
+        email:profile.emails[0].value,
+        provider:'google'
+      }
+    })
+    return user;
+  }
+
   static async findById({ user_id }) {
     const user = await UserModel.findOne({ id: user_id });
     return user;
