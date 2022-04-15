@@ -11,53 +11,54 @@ const userAuthRouter = Router();
 
 
 // login이 최초로 성공했을 때만 호출되는 함수
-// done(null, user.id)로 세션을 초기화 한다.
-passport.serializeUser(function (user, done) {
-  done(null, user.id);
+passport.serializeUser((user, done) => {
+  done(null, user); // user객체가 deserializeUser로 전달됨.
 });
 
 // 사용자가 페이지를 방문할 때마다 호출되는 함수
-// done(null, id)로 사용자의 정보를 각 request의 user 변수에 넣어준다.
-passport.deserializeUser(function (id, done) {
-  done(null, id);
+passport.deserializeUser((user, done) => {
+  done(null, user); // 여기의 user가 req.user가 됨
 });
 
-// Google login 전략
-// 로그인 성공 시 callback으로 request, accessToken, refreshToken, profile 등이 나온다.
+// Google login Strategy
+// 로그인 성공 시 callback으로 request, accessToken, refreshToken, profile 등이 반환.
 // 해당 콜백 function에서 사용자가 누구인지 done(null, user) 형식으로 넣으면 된다.
-// 이 예시에서는 넘겨받은 profile을 전달하는 것으로 대체했다.
 passport.use(
+  
   new GoogleStrategy(
       {
-          clientID: process.env.GOOGLE_CLIENT_ID,
-          clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-          callbackURL: "http://localhost:5000/auth/google/callback",
-          //passReqToCallback: true,
-          scope: ["email", "profile"],
+        clientID: process.env.GOOGLE_CLIENT_ID,
+        clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+        callbackURL: "https://localhost:5000/auth/google/callback",
+        
+        //passReqToCallback: true,
+        scope: ['profile', 'email'],
       },
-      function (request, accessToken, refreshToken, profile, done) {
-          console.log(profile);
-          console.log(accessToken);
+      async function (request, accessToken, refreshToken, profile, done) {
+        console.log(profile);
+        console.log(accessToken);
 
-          return done(null, profile);
+        return done(null, profile);
       }
   )
 );
 
-// google login 화면
+// google login 버튼을 클릭하면 호출
 userAuthRouter.get(
   "/auth/google",
-  passport.authenticate("google", { scope: ["email", "profile"] })
+  passport.authenticate("google", { scope: ['profile', 'email'] })
 );
 
-// google login 성공과 실패 리다이렉트
+// google login이 성공적으로 완료되면 "/"로 리다이렉트
+// 실패하면 "/login"으로 리다이렉트
 userAuthRouter.get(
   "/auth/google/callback",
-  passport.authenticate("google", {
-      successRedirect: "/",
-      failureRedirect: "/login",
-  })
+  passport.authenticate('google', {failureRedirect: "/login",}),
+  async function (req, res) {
+    res.redirect("/");
+  }
 );
+// 
 
 userAuthRouter.post("/user/register", async function (req, res, next) {
   try {
