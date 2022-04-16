@@ -16,37 +16,42 @@ function UserEditForm({ user, setIsEditing, setUser }) {
   const [show, setShow] = useState(false);
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     // 사진을 s3에 저장합니다.
     const formData = new FormData();
     formData.append("file", blob);
-    const response = await axios.post(
-      `http://localhost:5000/user/upload/image`,
-      formData,
-      {
-        headers: {
-          "Content-Type": "multipart/form-data",
-          Authorization: `Bearer ${sessionStorage.getItem("userToken")}`,
-        },
+    try {
+      const response = await axios.post(
+        `http://localhost:5000/user/upload/image`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${sessionStorage.getItem("userToken")}`,
+          },
+        }
+      );
+      if (response.data.success === false) {
+        setShow(true);
       }
-    );
-    if (response.data.success === false) {
+      // "users/유저id" 엔드포인트로 PUT 요청함.
+      else {
+        const res = await Api.put(`users/${user.id}`, {
+          name,
+          email,
+          description,
+          image: response.data.data,
+        });
+        // 유저 정보는 response의 data임.
+        const updatedUser = res.data;
+        // 해당 유저 정보로 user을 세팅함.
+        setUser(updatedUser);
+
+        // isEditing을 false로 세팅함.
+        setIsEditing(false);
+      }
+    } catch {
       setShow(true);
     }
-    // "users/유저id" 엔드포인트로 PUT 요청함.
-    const res = await Api.put(`users/${user.id}`, {
-      name,
-      email,
-      description,
-      image,
-    });
-    // 유저 정보는 response의 data임.
-    const updatedUser = res.data;
-    // 해당 유저 정보로 user을 세팅함.
-    setUser(updatedUser);
-
-    // isEditing을 false로 세팅함.
-    setIsEditing(false);
   };
 
   const imagePreview = (fileBlob) => {
@@ -117,6 +122,7 @@ function UserEditForm({ user, setIsEditing, setUser }) {
             </Col>
           </Form.Group>
         </Form>
+
         <Modal show={show} onHide={() => setShow(false)}>
           <Modal.Header closeButton>
             <Modal.Title>파일 선택 오류</Modal.Title>
