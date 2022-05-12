@@ -29,15 +29,15 @@ passport.use(
       {
         clientID: process.env.GOOGLE_CLIENT_ID,
         clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-        callbackURL: "https://localhost:5000/auth/google/callback",
+        callbackURL: "http://localhost:5000/auth/google/callback",
         
         //passReqToCallback: true,
         scope: ['profile', 'email'],
       },
       async function (request, accessToken, refreshToken, profile, done) {
-        console.log(profile);
-        console.log(accessToken);
+        console.log("profile",profile.displayName,profile.email);
 
+        
         return done(null, profile);
       }
   )
@@ -53,7 +53,7 @@ userAuthRouter.get(
 // 실패하면 "/login"으로 리다이렉트
 userAuthRouter.get(
   "/auth/google/callback",
-  passport.authenticate('google', {failureRedirect: "/login",}),
+  passport.authenticate('google', {failureRedirect: "/login"}),
   async function (req, res) {
     res.redirect("/");
   }
