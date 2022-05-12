@@ -8,7 +8,7 @@ import { projectRouter } from "./routers/projectRouter";
 import { userAuthRouter } from "./routers/userRouter";
 
 const app = express();
-const session = require('express-session');
+
 const passport = require("passport");
 
 // CORS 에러 방지
@@ -31,7 +31,7 @@ app.get("/", (req, res) => {
 });
 
 app.use(passport.initialize());
-app.use(passport.session());
+
 
 // router, service 구현 (userAuthRouter는 맨 위에 있어야 함.)
 app.use(userAuthRouter);
