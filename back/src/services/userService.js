@@ -36,8 +36,8 @@ class userAuthService {
       user.providerId = profile.id;
       user.name = profile.displayName;
     } else {
-// 비밀번호 해쉬화
-const hashedPassword = await bcrypt.hash(profile.displayName, 10);
+      // 비밀번호 해쉬화
+      const hashedPassword = await bcrypt.hash(profile.displayName, 10);
 
       // id 는 유니크 값 부여
       const id = uuidv4();
@@ -53,7 +53,15 @@ const hashedPassword = await bcrypt.hash(profile.displayName, 10);
       createdNewUser.errorMessage = null; // 문제 없이 db 저장 완료되었으므로 에러가 없음.
       user = await User.findByEmail({email});
     }
-    return user;
+    const secretKey = process.env.JWT_SECRET_KEY || "jwt-secret-key";
+    const token = jwt.sign({ user_id: user.id }, secretKey);
+
+    const loginUser = {
+      token,
+      user
+    };
+
+    return loginUser;
   }
 
   static async getUser({ email, password }) {
