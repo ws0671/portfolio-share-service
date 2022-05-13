@@ -6,6 +6,7 @@ import { educationRouter } from "./routers/educationRouter";
 import { errorMiddleware } from "./middlewares/errorMiddleware";
 import { projectRouter } from "./routers/projectRouter";
 import { userAuthRouter } from "./routers/userRouter";
+import { googleAuthRouter } from "./routers/googleAuthRouter";
 
 const app = express();
 
@@ -35,6 +36,7 @@ app.use(passport.initialize());
 
 // router, service 구현 (userAuthRouter는 맨 위에 있어야 함.)
 app.use(userAuthRouter);
+app.use(googleAuthRouter);
 app.use(awardRouter);
 app.use(certificateRouter);
 app.use(educationRouter);
