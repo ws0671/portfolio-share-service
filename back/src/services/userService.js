@@ -168,6 +168,17 @@ class userAuthService {
 
     return user;
   }
+
+  static async getSearchList({name, page, perPage, sortField}) {
+
+    const userList = await User.findPageListByName({
+      name, 
+      page, 
+      perPage, 
+      sortField
+    });
+    return userList;
+  }
 }
 
 export { userAuthService };
