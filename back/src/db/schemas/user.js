@@ -18,6 +18,10 @@ const UserSchema = new Schema(
       type: String,
       required: true,
     },
+    provider: {
+      type:String,
+      required: false,
+    },
     description: {
       type: String,
       required: false,
