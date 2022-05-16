@@ -1,6 +1,6 @@
 import axios from "axios";
 import React, { useState } from "react";
-import { Button, Form, Card, Col, Row } from "react-bootstrap";
+import { Button, Form, Card, Col, Row, Modal } from "react-bootstrap";
 import * as Api from "../../api";
 
 function UserEditForm({ user, setIsEditing, setUser }) {
@@ -12,33 +12,46 @@ function UserEditForm({ user, setIsEditing, setUser }) {
   const [description, setDescription] = useState(user.description);
   const [image, setImage] = useState(user.image);
   const [blob, setBlob] = useState();
+  //모달 창 boolean값으로 on, off하기.
+  const [show, setShow] = useState(false);
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     // 사진을 s3에 저장합니다.
     const formData = new FormData();
     formData.append("file", blob);
-    await axios.post(`http://localhost:5000/user/upload/image`, formData, {
-      headers: {
-        "Content-Type": "multipart/form-data",
-        Authorization: `Bearer ${sessionStorage.getItem("userToken")}`,
-      },
-    });
+    try {
+      const response = await axios.post(
+        `http://localhost:5000/user/upload/image`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${sessionStorage.getItem("userToken")}`,
+          },
+        }
+      );
+      if (response.data.success === false) {
+        setShow(true);
+      }
+      // "users/유저id" 엔드포인트로 PUT 요청함.
+      else {
+        const res = await Api.put(`users/${user.id}`, {
+          name,
+          email,
+          description,
+          image: response.data.data,
+        });
+        // 유저 정보는 response의 data임.
+        const updatedUser = res.data;
+        // 해당 유저 정보로 user을 세팅함.
+        setUser(updatedUser);
 
-    // "users/유저id" 엔드포인트로 PUT 요청함.
-    const res = await Api.put(`users/${user.id}`, {
-      name,
-      email,
-      description,
-      image,
-    });
-    // 유저 정보는 response의 data임.
-    const updatedUser = res.data;
-    // 해당 유저 정보로 user을 세팅함.
-    setUser(updatedUser);
-
-    // isEditing을 false로 세팅함.
-    setIsEditing(false);
+        // isEditing을 false로 세팅함.
+        setIsEditing(false);
+      }
+    } catch {
+      setShow(true);
+    }
   };
 
   const imagePreview = (fileBlob) => {
@@ -109,6 +122,22 @@ function UserEditForm({ user, setIsEditing, setUser }) {
             </Col>
           </Form.Group>
         </Form>
+
+        <Modal show={show} onHide={() => setShow(false)}>
+          <Modal.Header closeButton>
+            <Modal.Title>파일 선택 오류</Modal.Title>
+          </Modal.Header>
+
+          <Modal.Body>
+            <p>5MB 이하 이미지 파일 또는 이미지 파일만 업로드 가능합니다.</p>
+          </Modal.Body>
+
+          <Modal.Footer>
+            <Button variant="secondary" onClick={() => setShow(false)}>
+              닫기
+            </Button>
+          </Modal.Footer>
+        </Modal>
       </Card.Body>
     </Card>
   );
