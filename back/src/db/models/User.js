@@ -25,6 +25,17 @@ class User {
   }
 
   /**
+   * name으로 검색한 user리스트의 마지막 페이지 번호 반환
+   */
+   static async findFinalPage({name, perPage}) {
+    const userList = await UserModel.countDocuments({
+      name: { $regex: name, $options: "i" }
+    });
+    const finalPage = Math.ceil(userList / perPage);
+    return finalPage;
+  }
+
+  /**
    * name으로 user리스트를 찾아 페이징처리하여 반환하는 함수
    */
   static async findPageListByName({name, page, perPage, sortField}){

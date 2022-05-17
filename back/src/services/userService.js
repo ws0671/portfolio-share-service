@@ -169,6 +169,17 @@ class userAuthService {
     return user;
   }
 
+  /**
+   * name으로 검색한 user 목록의 마지막 페이지 반환
+   */
+   static async getFinalPage({name, perPage}) {
+    const finalPage = await User.findFinalPage({name, perPage})
+    return finalPage;
+  }
+
+  /**
+   * name으로 검색한 user 목록 반환(페이징)
+   */
   static async getSearchList({name, page, perPage, sortField}) {
 
     const userList = await User.findPageListByName({
