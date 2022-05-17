@@ -78,6 +78,7 @@ const Main = styled.main`
   .cardContainer {
     flex-wrap: wrap;
     display: flex;
+    justify-content: center;
   }
 `;
 export default Network;
