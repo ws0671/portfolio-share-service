@@ -6,6 +6,7 @@ import { GoSearch } from "react-icons/go";
 import * as Api from "../../api";
 import UserCard from "./UserCard";
 import { UserStateContext } from "../../App";
+import NetworkPagination from "./NetworkPagination";
 
 function Network() {
   const navigate = useNavigate();
@@ -15,6 +16,7 @@ function Network() {
   const [searchWord, setSearchWord] = useState(null);
   const [data, setData] = useState(null);
   const [page, setPage] = useState(1);
+  const [lastPage, setLastPage] = useState(1);
 
   useEffect(() => {
     // 만약 전역 상태의 user가 null이라면, 로그인 페이지로 이동함.
@@ -26,17 +28,21 @@ function Network() {
     Api.get("userlist").then((res) => setUsers(res.data));
   }, [userState, navigate]);
 
+  useEffect(() => {
+    getData(searchWord);
+  }, [page]);
   const getData = async (word) => {
     const res = await Api.get(
       `user/search?name=${word}&page=${page}&perPage=8&sortField`
     );
-    setData(res.data);
+    setData(res.data.searchList);
+    setLastPage(res.data.finalPage);
   };
   const handleSubmit = (e) => {
     e.preventDefault();
     getData(searchWord);
-    console.log(data);
   };
+
   return (
     <Container fluid>
       <SearchBar>
@@ -59,6 +65,9 @@ function Network() {
               ))}
         </div>
       </Main>
+      {lastPage !== 0 && (
+        <NetworkPagination page={page} lastPage={lastPage} setPage={setPage} />
+      )}
     </Container>
   );
 }
