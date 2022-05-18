@@ -121,6 +121,8 @@ userAuthRouter.get(
       const page = req.query.page || 1; // default 1페이지
       const perPage = req.query.perPage || 10; //default 10개
       const sortField = req.query.sortField || null; //입력 없으면 null값
+
+      const finalPage = await userAuthService.getFinalPage({name, perPage})
       
       const searchList = await userAuthService.getSearchList({
         name, 
@@ -129,8 +131,13 @@ userAuthRouter.get(
         sortField
       });
 
+      const listPaged = {
+        finalPage: finalPage,
+        searchList: searchList
+      }
+
       //user리스트를 응답값으로 반환
-      res.status(200).json(searchList);
+      res.status(200).json(listPaged);
 
     } catch(error) {
       next(error);
