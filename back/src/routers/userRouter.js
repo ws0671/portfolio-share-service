@@ -4,6 +4,7 @@ import { login_required } from "../middlewares/login_required";
 import { upload } from "../middlewares/upload";
 import { userAuthService } from "../services/userService";
 
+
 const userAuthRouter = Router();
 
 userAuthRouter.post("/user/register", async function (req, res, next) {
@@ -107,6 +108,42 @@ userAuthRouter.get(
     }
   }
 );
+
+userAuthRouter.get(
+  "/user/search",
+  login_required,
+  async function (req, res, next){
+    try {
+      //name 정규식에 따른 user 리스트 불러오기
+      //paging 처리
+      //sortField 기준으로 정렬
+      const {name} = req.query;
+      const page = req.query.page || 1; // default 1페이지
+      const perPage = req.query.perPage || 10; //default 10개
+      const sortField = req.query.sortField || null; //입력 없으면 null값
+
+      const finalPage = await userAuthService.getFinalPage({name, perPage})
+      
+      const searchList = await userAuthService.getSearchList({
+        name, 
+        page, 
+        perPage, 
+        sortField
+      });
+
+      const listPaged = {
+        finalPage: finalPage,
+        searchList: searchList
+      }
+
+      //user리스트를 응답값으로 반환
+      res.status(200).json(listPaged);
+
+    } catch(error) {
+      next(error);
+    }
+  }
+  )
 
 userAuthRouter.get(
   "/user/current",

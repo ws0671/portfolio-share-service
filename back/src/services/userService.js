@@ -27,6 +27,43 @@ class userAuthService {
     return createdNewUser;
   }
 
+  static async addGoogleUser({ profile }) {
+    const email = profile.emails[0].value;
+    let user = await User.findByEmail({email});
+
+    if (user) {
+      user.provider = profile.provider;
+      user.providerId = profile.id;
+      user.name = profile.displayName;
+    } else {
+      // 비밀번호 해쉬화
+      const hashedPassword = await bcrypt.hash(profile.displayName, 10);
+
+      // id 는 유니크 값 부여
+      const id = uuidv4();
+      const newUser = {
+        id,
+        name: profile.displayName,
+        email: profile.emails[0].value,
+        password: hashedPassword,
+        provider: "google",
+      };
+      // db에 저장
+      const createdNewUser = await User.create({newUser});
+      createdNewUser.errorMessage = null; // 문제 없이 db 저장 완료되었으므로 에러가 없음.
+      user = await User.findByEmail({email});
+    }
+    const secretKey = process.env.JWT_SECRET_KEY || "jwt-secret-key";
+    const token = jwt.sign({ user_id: user.id }, secretKey);
+
+    const loginUser = {
+      token,
+      user
+    };
+
+    return loginUser;
+  }
+
   static async getUser({ email, password }) {
     // 이메일 db에 존재 여부 확인
     const user = await User.findByEmail({ email });
@@ -130,6 +167,28 @@ class userAuthService {
     }
 
     return user;
+  }
+
+  /**
+   * name으로 검색한 user 목록의 마지막 페이지 반환
+   */
+   static async getFinalPage({name, perPage}) {
+    const finalPage = await User.findFinalPage({name, perPage})
+    return finalPage;
+  }
+
+  /**
+   * name으로 검색한 user 목록 반환(페이징)
+   */
+  static async getSearchList({name, page, perPage, sortField}) {
+
+    const userList = await User.findPageListByName({
+      name, 
+      page, 
+      perPage, 
+      sortField
+    });
+    return userList;
   }
 }
 
