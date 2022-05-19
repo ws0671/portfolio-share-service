@@ -11,7 +11,7 @@ const googleAuthRouter = Router();
 // const GoogleStrategy = require("passport-google-oauth2").Strategy;
 
 
-googleAuthRouter.post('/googlelogin',
+googleAuthRouter.post("/auth/google",
   async function (req, res, next){
     try{
       const idToken = req.body.token;
