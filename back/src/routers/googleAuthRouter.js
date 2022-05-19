@@ -16,6 +16,7 @@ googleAuthRouter.post('/googlelogin',
     try{
       const idToken = req.body.token;
 
+      //idToken 검증 함수 verify()
       async function verify() {
         const ticket = await client.verifyIdToken({
           idToken: idToken,
