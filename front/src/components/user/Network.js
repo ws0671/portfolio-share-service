@@ -49,11 +49,14 @@ function Network() {
         setLastPage(res.data.finalPage);
       }
     } else {
-      const res = await Api.get("userlist");
+      // const res = await Api.get("userlist");
+      const res = await Api.get(
+        `user/search?name&page=${page}&perPage=8&sortField`
+      );
       setNoSearchList("");
-      setData(res.data);
-      const count = Math.ceil(res.data.length / 8);
-      setLastPage(count);
+      setData(res.data.searchList);
+      // const count = Math.ceil(res.data.length / 8);
+      setLastPage(res.data.finalPage);
     }
   };
   const handleSubmit = (e) => {
