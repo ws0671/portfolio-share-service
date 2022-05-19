@@ -17,6 +17,8 @@ function Network() {
   const [data, setData] = useState(null);
   const [page, setPage] = useState(1);
   const [lastPage, setLastPage] = useState(1);
+  const [noSearchList, setNoSearchList] = useState("");
+  const [searchValue, setSearchValue] = useState("");
 
   useEffect(() => {
     // 만약 전역 상태의 user가 null이라면, 로그인 페이지로 이동함.
@@ -24,23 +26,41 @@ function Network() {
       navigate("/login");
       return;
     }
+    getData();
     // "userlist" 엔드포인트로 GET 요청을 하고, users를 response의 data로 세팅함.
-    Api.get("userlist").then((res) => setUsers(res.data));
   }, [userState, navigate]);
 
   useEffect(() => {
     getData(searchWord);
-  }, [page]);
+  }, [page, searchValue]);
   const getData = async (word) => {
-    const res = await Api.get(
-      `user/search?name=${word}&page=${page}&perPage=8&sortField`
-    );
-    setData(res.data.searchList);
-    setLastPage(res.data.finalPage);
+    if (word && word.length > 0) {
+      const res = await Api.get(
+        `user/search?name=${word}&page=${page}&perPage=8&sortField`
+      );
+      console.log(res.data);
+      if (res.data.searchList.length === 0) {
+        const value = `'${word}'에 대한 검색 결과가 없습니다.`;
+        setNoSearchList(value);
+        setData(res.data.searchList);
+        setLastPage(0);
+      } else {
+        setNoSearchList("");
+        setData(res.data.searchList);
+        setLastPage(res.data.finalPage);
+      }
+    } else {
+      const res = await Api.get("userlist");
+      setNoSearchList("");
+      setData(res.data);
+      const count = Math.ceil(res.data.length / 8);
+      setLastPage(count);
+    }
   };
   const handleSubmit = (e) => {
     e.preventDefault();
-    getData(searchWord);
+    setSearchValue(searchWord);
+    setPage(1);
   };
 
   return (
@@ -55,14 +75,12 @@ function Network() {
         </form>
       </SearchBar>
       <Main>
+        <h3>{noSearchList}</h3>
         <div className="cardContainer">
-          {data
-            ? data.map((user) => (
-                <UserCard key={user.id} user={user} isNetwork />
-              ))
-            : users.map((user) => (
-                <UserCard key={user.id} user={user} isNetwork />
-              ))}
+          {data &&
+            data.map((user) => (
+              <UserCard key={user.id} user={user} isNetwork />
+            ))}
         </div>
       </Main>
       {lastPage !== 0 && (
@@ -88,6 +106,9 @@ const Main = styled.main`
     flex-wrap: wrap;
     display: flex;
     justify-content: center;
+  }
+  h3 {
+    text-align: center;
   }
 `;
 export default Network;
