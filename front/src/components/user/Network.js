@@ -38,7 +38,6 @@ function Network() {
       const res = await Api.get(
         `user/search?name=${word}&page=${page}&perPage=8&sortField`
       );
-      console.log(res.data);
       if (res.data.searchList.length === 0) {
         const value = `'${word}'에 대한 검색 결과가 없습니다.`;
         setNoSearchList(value);
@@ -72,6 +71,20 @@ function Network() {
             placeholder="유저이름으로 검색"
             onChange={(e) => setSearchWord(e.target.value)}
           ></input>
+          <button className="searchBtn" type="submit" disabled={!searchWord}>
+            검색
+          </button>
+          <button
+            className="wholeBtn"
+            onClick={() => {
+              setPage(1);
+              setSearchValue("");
+              setSearchWord("");
+              setNoSearchList("");
+            }}
+          >
+            전체
+          </button>
         </form>
       </SearchBar>
       <Main>
@@ -94,8 +107,19 @@ const SearchBar = styled.div`
   input {
     width: 300px;
     text-align: center;
-    padding: 0 40px;
-    border-radius: 20px;
+    padding: 7px 40px;
+    border-radius: 5px;
+    border: 1px gray solid;
+    margin-right: 30px;
+  }
+  .searchBtn {
+    display: none;
+  }
+  .wholeBtn {
+    padding: 5px;
+    border-radius: 5px;
+    background: linear-gradient(lightCyan, skyBlue, deepSkyBlue);
+    border: 1px blue solid;
   }
   margin-bottom: 50px;
 `;
