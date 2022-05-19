@@ -118,8 +118,12 @@ const SearchBar = styled.div`
   .wholeBtn {
     padding: 5px;
     border-radius: 5px;
-    background: linear-gradient(lightCyan, skyBlue, deepSkyBlue);
+    background: skyblue;
     border: 1px blue solid;
+    transition: all 1s;
+    &:hover {
+      background-color: white;
+    }
   }
   margin-bottom: 50px;
 `;
