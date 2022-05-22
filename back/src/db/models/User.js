@@ -24,6 +24,36 @@ class User {
     return user;
   }
 
+  /**
+   * name으로 검색한 user리스트의 마지막 페이지 번호 반환
+   */
+   static async findFinalPage({name, perPage}) {
+    const userList = await UserModel.countDocuments({
+      name: { $regex: name, $options: "i" }
+    });
+    const finalPage = Math.ceil(userList / perPage);
+    return finalPage;
+  }
+
+  /**
+   * name으로 user리스트를 찾아 페이징처리하여 반환하는 함수
+   */
+  static async findPageListByName({name, page, perPage, sortField}){
+    //name 정규식에 따른 user 리스트 불러오기
+    //paging 처리
+    //sortField 기준으로 정렬
+    if (sortField == null) {
+      return await UserModel.find({
+        name: { $regex: name, $options: "i" }
+      })
+      .sort({createdAt: -1}) //createAt 기준으로 정렬
+      .limit(perPage) //한페이지에서 확인할 수 있는 결과의 수
+      .skip((page - 1) * perPage) //페이지에 따른 skip 기준
+      .lean();
+    } 
+  }
+  
+
   static async findById({ user_id }) {
     const user = await UserModel.findOne({ id: user_id });
     return user;
