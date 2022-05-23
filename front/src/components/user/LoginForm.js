@@ -7,6 +7,7 @@ import { DispatchContext } from "../../App";
 
 // 구글 로그인 컴포넌트 import
 import GLogin from "./GoogleLogin";
+// 카카오 로그인 컴포넌트 import
 import KakaoLogin from "./KakaoLogin";
 
 function LoginForm() {
