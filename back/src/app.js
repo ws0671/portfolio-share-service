@@ -5,6 +5,7 @@ import { certificateRouter } from "./routers/certificateRouter";
 import { educationRouter } from "./routers/educationRouter";
 import { errorMiddleware } from "./middlewares/errorMiddleware";
 import { projectRouter } from "./routers/projectRouter";
+import { commentRouter } from "./routers/commentRouter";
 import { userAuthRouter } from "./routers/userRouter";
 import { googleAuthRouter } from "./routers/googleAuthRouter";
 
@@ -41,6 +42,7 @@ app.use(awardRouter);
 app.use(certificateRouter);
 app.use(educationRouter);
 app.use(projectRouter);
+app.use(commentRouter);
 
 // 순서 중요 (router 에서 next() 시 아래의 에러 핸들링  middleware로 전달됨)
 app.use(errorMiddleware);
