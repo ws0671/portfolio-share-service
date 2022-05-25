@@ -7,6 +7,8 @@ import { DispatchContext } from "../../App";
 
 // 구글 로그인 컴포넌트 import
 import GLogin from "./GoogleLogin";
+// 카카오 로그인 컴포넌트 import
+import KakaoLogin from "./KakaoLogin";
 
 function LoginForm() {
   const navigate = useNavigate();
@@ -117,6 +119,13 @@ function LoginForm() {
             <Form.Group as={Row} className="mt-3 text-center">
               <Col sm={{ span: 20 }}>
                 <GLogin />
+              </Col>
+            </Form.Group>
+
+            {/* 카카오 로그인 컴포넌트 추가 */}
+            <Form.Group as={Row} className="mt-3 text-center">
+              <Col sm={{ span: 20 }}>
+                <KakaoLogin />
               </Col>
             </Form.Group>
           </Form>

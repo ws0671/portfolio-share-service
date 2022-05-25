@@ -1,50 +1,47 @@
-import React from "react";
+import React, { useContext } from "react";
 import { GoogleLogin } from "react-google-login";
-import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
-// import * as Api from "../../api";
+import * as Api from "../../api";
+import * as Keys from "../../keys.js";
+import { DispatchContext } from "../../App";
 
 function GLogin() {
-  const clientId = process.env.REACT_APP_CLIENT_ID;
+  const navigate = useNavigate();
+  const dispatch = useContext(DispatchContext);
+
+  const clientId = Keys.GOOGLE_CLIENT_ID;
 
   async function onSuccess(googleData) {
     try {
-      // "auth/google" 엔드포인트로 get요청함.
-      // await Api.get("auth/google", {
-      //   email: googleData.getBasicProfile().getEmail(),
-      //   name: googleData.getBasicProfile().getName(),
-      //   token: googleData.tokenId,
-      // });
+      // "auth/google" 엔드포인트로 post 요청함.
+      const res = await Api.post("auth/google", {
+        token: googleData.tokenId,
+      });
 
-      const backendPortNumber = "5000";
-      const serverUrl =
-        "http://" + window.location.hostname + ":" + backendPortNumber + "/";
+      // 유저 정보는 response의 data임.
+      const user = res.data;
 
-      // const bodyData = JSON.stringify({
-      //   email: googleData.getBasicProfile().getEmail(),
-      //   name: googleData.getBasicProfile().getName(),
-      //   token: googleData.tokenId,
-      // });
-      console.log(
-        `%cGoogleLogin GET 요청: ${serverUrl + "auth/google"}`,
-        "color: #296aba;"
-      );
-      // console.log(
-      //   `%cGoogloeLogin GET 요청 데이터: ${bodyData}`,
-      //   "color: #296aba;"
-      // );
+      // JWT 토큰은 유저 정보의 token임.
+      const jwtToken = user.token;
+      // sessionStorage에 "userToken"이라는 키로 JWT 토큰을 저장함.
+      sessionStorage.setItem("userToken", jwtToken);
 
-      axios.get(serverUrl + "auth/google");
+      // dispatch 함수를 이용해 로그인 성공 상태로 만듦.
+      dispatch({
+        type: "LOGIN_SUCCESS",
+        payload: user,
+      });
 
       // portfolio 페이지로 이동함.
-      // navigate("/", { replace: true });
+      navigate("/", { replace: true });
     } catch (err) {
-      console.log("구글 로그인에 실패했습니다 2 :", err);
+      console.log("구글 로그인에 실패했습니다2 :", err);
     }
   }
 
   async function onFailure(res) {
-    console.log("구글 로그인에 실패했습니다 : ", res);
+    console.log("구글 로그인에 실패했습니다1 ", res);
   }
 
   return (

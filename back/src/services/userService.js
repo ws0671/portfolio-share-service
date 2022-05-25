@@ -26,43 +26,54 @@ class userAuthService {
 
     return createdNewUser;
   }
+  
 
-  static async addGoogleUser({ profile }) {
-    const email = profile.emails[0].value;
-    let user = await User.findByEmail({email});
+  static async addGoogleUser2({email, name}) {
+    // 이메일 db에 존재 여부 확인
 
-    if (user) {
-      user.provider = profile.provider;
-      user.providerId = profile.id;
-      user.name = profile.displayName;
-    } else {
+    let user = await User.findByEmail({ email });
+
+    //유저가 없으면 생성 후 로그인
+    if (!user) {
       // 비밀번호 해쉬화
-      const hashedPassword = await bcrypt.hash(profile.displayName, 10);
+      const hashedPassword = bcrypt.hashSync(email, 10);
 
       // id 는 유니크 값 부여
       const id = uuidv4();
       const newUser = {
         id,
-        name: profile.displayName,
-        email: profile.emails[0].value,
+        name,
+        email,
         password: hashedPassword,
         provider: "google",
       };
+
       // db에 저장
       const createdNewUser = await User.create({newUser});
       createdNewUser.errorMessage = null; // 문제 없이 db 저장 완료되었으므로 에러가 없음.
       user = await User.findByEmail({email});
     }
+
+    // 로그인 성공 -> JWT 웹 토큰 생성
     const secretKey = process.env.JWT_SECRET_KEY || "jwt-secret-key";
     const token = jwt.sign({ user_id: user.id }, secretKey);
 
+    // 반환할 loginuser 객체를 위한 변수 설정
+    const id = user.id;
+    const description = user.description;
+
     const loginUser = {
       token,
-      user
+      id,
+      email,
+      name,
+      description,
+      errorMessage: null,
     };
 
     return loginUser;
   }
+
 
   static async getUser({ email, password }) {
     // 이메일 db에 존재 여부 확인

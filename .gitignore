@@ -3,7 +3,7 @@ node_modules
 
 # env
 back/.env
-front/.env
+front/src/keys.js
 
 # config
 back/src/config/
