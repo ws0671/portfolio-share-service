@@ -9,6 +9,7 @@ import Certificates from "./certificate/Certificates";
 import Educations from "./education/Educations";
 import Projects from "./project/Projects";
 import User from "./user/User";
+import Comment from "./guestbook/Comment";
 
 function Portfolio() {
   const navigate = useNavigate();
@@ -63,6 +64,7 @@ function Portfolio() {
             portfolioOwnerId={portfolioOwner.id}
             isEditable={portfolioOwner.id === userState.user?.id}
           />
+          <Comment targetId={params.userId}></Comment>
         </Col>
         <Col>
           <Educations
