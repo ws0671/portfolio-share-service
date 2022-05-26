@@ -5,6 +5,11 @@ import { Container, Col, Row, Form, Button } from "react-bootstrap";
 import * as Api from "../../api";
 import { DispatchContext } from "../../App";
 
+// 구글 로그인 컴포넌트 import
+import GLogin from "./GoogleLogin";
+// 카카오 로그인 컴포넌트 import
+import KakaoLogin from "./KakaoLogin";
+
 function LoginForm() {
   const navigate = useNavigate();
   const dispatch = useContext(DispatchContext);
@@ -107,6 +112,20 @@ function LoginForm() {
                 <Button variant="light" onClick={() => navigate("/register")}>
                   회원가입하기
                 </Button>
+              </Col>
+            </Form.Group>
+
+            {/* 구글 로그인 컴포넌트 추가 */}
+            <Form.Group as={Row} className="mt-3 text-center">
+              <Col sm={{ span: 20 }}>
+                <GLogin />
+              </Col>
+            </Form.Group>
+
+            {/* 카카오 로그인 컴포넌트 추가 */}
+            <Form.Group as={Row} className="mt-3 text-center">
+              <Col sm={{ span: 20 }}>
+                <KakaoLogin />
               </Col>
             </Form.Group>
           </Form>

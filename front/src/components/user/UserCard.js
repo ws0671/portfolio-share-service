@@ -6,11 +6,12 @@ function UserCard({ user, setIsEditing, isEditable, isNetwork }) {
   return (
     <Card className="mb-2 ms-3 mr-5" style={{ width: "18rem" }}>
       <Card.Body>
-        <Row className="justify-content-md-center">
+        <Row className="justify-content-center">
           <Card.Img
             style={{ width: "10rem", height: "8rem" }}
             className="mb-3"
-            src="http://placekitten.com/200/200"
+            //user의 image 프로퍼티에 접근할때 optional chaining을 사용하였습니다.
+            src={user?.image ? user.image : "http://placekitten.com/200/200"}
             alt="랜덤 고양이 사진 (http://placekitten.com API 사용)"
           />
         </Row>

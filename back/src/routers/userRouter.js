@@ -1,7 +1,9 @@
 import is from "@sindresorhus/is";
 import { Router } from "express";
 import { login_required } from "../middlewares/login_required";
+import { upload } from "../middlewares/upload";
 import { userAuthService } from "../services/userService";
+
 
 const userAuthRouter = Router();
 
@@ -54,6 +56,45 @@ userAuthRouter.post("/user/login", async function (req, res, next) {
   }
 });
 
+userAuthRouter.post(
+  "/user/upload/image",
+  login_required,
+  upload,
+  async function (req, res, next) {
+    try {
+      // jwt토큰에서 추출된 사용자 id를 가지고 db에서 사용자 정보를 찾음.
+      const user_id = req.currentUserId;
+      const currentUserInfo = await userAuthService.getUserInfo({
+        user_id,
+      });
+
+      if (currentUserInfo.errorMessage) {
+        throw new Error(currentUserInfo.errorMessage);
+      }
+
+      // req (request) 에서 데이터 가져오기
+      // location: 프론트에서 요청받아 multer로 저장된 파일데이터
+      const fileData = req.file;
+
+      // multer 미들웨어에서 에러 발생시 error 출력
+      if (fileData === undefined) {
+        return res.status(202).json({
+          success: false,
+          message: "사진 저장 실패",
+        });
+      } else {
+        res.status(200).json({
+          success: true,
+          message: "사진 저장 성공",
+          data: fileData.location
+        });
+      }
+    } catch (error) {
+      next(error);
+    }
+  }
+);
+
 userAuthRouter.get(
   "/userlist",
   login_required,
@@ -67,6 +108,42 @@ userAuthRouter.get(
     }
   }
 );
+
+userAuthRouter.get(
+  "/user/search",
+  login_required,
+  async function (req, res, next){
+    try {
+      //name 정규식에 따른 user 리스트 불러오기
+      //paging 처리
+      //sortField 기준으로 정렬
+      const {name} = req.query;
+      const page = req.query.page || 1; // default 1페이지
+      const perPage = req.query.perPage || 10; //default 10개
+      const sortField = req.query.sortField || null; //입력 없으면 null값
+
+      const finalPage = await userAuthService.getFinalPage({name, perPage})
+      
+      const searchList = await userAuthService.getSearchList({
+        name, 
+        page, 
+        perPage, 
+        sortField
+      });
+
+      const listPaged = {
+        finalPage: finalPage,
+        searchList: searchList
+      }
+
+      //user리스트를 응답값으로 반환
+      res.status(200).json(listPaged);
+
+    } catch(error) {
+      next(error);
+    }
+  }
+  )
 
 userAuthRouter.get(
   "/user/current",
@@ -102,8 +179,9 @@ userAuthRouter.put(
       const email = req.body.email ?? null;
       const password = req.body.password ?? null;
       const description = req.body.description ?? null;
+      const image = req.body.image ?? null;
 
-      const toUpdate = { name, email, password, description };
+      const toUpdate = { name, email, password, description, image };
 
       // 해당 사용자 아이디로 사용자 정보를 db에서 찾아 업데이트함. 업데이트 요소가 없을 시 생략함
       const updatedUser = await userAuthService.setUser({ user_id, toUpdate });
