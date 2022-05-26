@@ -5,7 +5,7 @@ import { UserStateContext } from "../../App";
 
 import CommentElement from "./CommentElement";
 
-const Comment = ({ targetId }) => {
+const Comment = ({ targetId, portfolioOwnerId }) => {
   const [review, setReview] = useState("");
   const [reviewArray, setReviewArray] = useState([]);
   const [commentList, setCommentList] = useState([]);
@@ -52,22 +52,24 @@ const Comment = ({ targetId }) => {
   const removeHandler = async (item) => {
     await Api.delete(`comments/${item.id}`);
     const res = await Api.get(
-      `commentlist/${targetId ? targetId : userState.user.id}`
+      `commentlist/${targetId ? targetId : portfolioOwnerId}`
     );
     setCommentList(res.data);
   };
 
   //댓글 목록을 불러오는 함수
   const getCommentList = async () => {
+    console.log(targetId);
+    console.log(userState.user.id);
     const res = await Api.get(
-      `commentlist/${targetId ? targetId : userState.user.id}`
+      `commentlist/${targetId ? targetId : portfolioOwnerId}`
     );
     setCommentList(res.data);
   };
 
   useEffect(() => {
     getCommentList();
-  }, [reviewArray, targetId]);
+  }, [reviewArray, portfolioOwnerId]);
   return (
     <Container>
       <h4>방명록</h4>

@@ -47,7 +47,7 @@ const CommentElement = ({ data, editHandler, removeHandler }) => {
         <>
           <span className="userId">{data.writer.name}</span>
           <span className="text">{data.content}</span>
-          {data.writer.id === userState.user.id && (
+          {data.writer?.id === userState.user?.id && (
             <>
               <AiFillEdit
                 style={{ cursor: "pointer" }}

@@ -64,7 +64,10 @@ function Portfolio() {
             portfolioOwnerId={portfolioOwner.id}
             isEditable={portfolioOwner.id === userState.user?.id}
           />
-          <Comment targetId={params.userId}></Comment>
+          <Comment
+            portfolioOwnerId={portfolioOwner.id}
+            targetId={params.userId}
+          ></Comment>
         </Col>
         <Col>
           <Educations
